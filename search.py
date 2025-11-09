@@ -75,7 +75,7 @@ def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
+def depthFirstSearch(problem: SearchProblem):
     """
     Search the deepest nodes in the search tree first.
 
@@ -91,6 +91,32 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """
     "*** YOUR CODE HERE ***"
     from util import Stack
+<<<<<<< HEAD
+
+    start = problem.getStartState()
+    frontier = Stack()
+    frontier.push((start, []))          # (state, path)
+    visited = set()
+
+    while not frontier.isEmpty():
+        state, path = frontier.pop()
+
+        if state in visited:
+            continue
+
+        if problem.isGoalState(state):
+            return path
+
+        visited.add(state)
+
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                frontier.push((succ, path + [action]))
+
+    return []    # no solution found
+
+=======
+>>>>>>> 79b5f16 (更新agent only)
 
     start = problem.getStartState()
     frontier = Stack()
@@ -115,7 +141,8 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     return []    # no solution found
 
 
-def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
+
+def breadthFirstSearch(problem: SearchProblem) :
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
@@ -140,7 +167,26 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     return []    # no solution found
 
 
-def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
+    start = problem.getStartState()
+    frontier = Queue()
+    frontier.push((start, []))          # (state, path)
+    visited = set([start])
+
+    while not frontier.isEmpty():
+        state, path = frontier.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                visited.add(succ)
+                frontier.push((succ, path + [action]))
+
+    return []    # no solution found
+    "*** YOUR CODE HERE ***"
+
+def uniformCostSearch(problem: SearchProblem) :
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     
@@ -184,7 +230,7 @@ def nullHeuristic(state, problem=None) -> float:
     """
     return 0
 
-def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
+def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) : 
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     
