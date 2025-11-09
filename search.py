@@ -90,17 +90,92 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Stack
+
+    start = problem.getStartState()
+    frontier = Stack()
+    frontier.push((start, []))          # (state, path)
+    visited = set()
+
+    while not frontier.isEmpty():
+        state, path = frontier.pop()
+
+        if state in visited:
+            continue
+
+        if problem.isGoalState(state):
+            return path
+
+        visited.add(state)
+
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                frontier.push((succ, path + [action]))
+
+    return []    # no solution found
+
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import Queue
+
+    start = problem.getStartState()
+    frontier = Queue()
+    frontier.push((start, []))          # (state, path)
+    visited = set([start])
+
+    while not frontier.isEmpty():
+        state, path = frontier.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                visited.add(succ)
+                frontier.push((succ, path + [action]))
+
+    return []    # no solution found
+
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    #    PriorityQueue : ((state, actions), priority)
+    frontier = util.PriorityQueue()
+    expanded = set()
+    
+    # 起始節點放入 frontier
+    startState = problem.getStartState()
+    frontier.push((startState, []), 0 ) # ((狀態, 動作列表), 成本 )
+
+    while not frontier.isEmpty():
+        
+        currentState, actions = frontier.pop()# 成本最低的
+        
+        if problem.isGoalState(currentState):
+            return actions
+            
+        if currentState not in expanded:
+            
+            expanded.add(currentState)
+            successors = problem.getSuccessors(currentState)
+            
+            # 後繼節點加入 frontier
+            for nextState, action, stepCost in successors:
+                newActions = actions + [action]
+
+                newCost = problem.getCostOfActions(newActions)
+                
+                # 將 new.state加入優先佇列
+                frontier.push( (nextState, newActions), newCost )
+
+    # 若frontier 為空，代表找不到路徑
+    return []
+
 
 def nullHeuristic(state, problem=None) -> float:
     """
@@ -112,10 +187,56 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    frontier = util.PriorityQueue()
+    expanded = set()
+    
+    startState = problem.getStartState()
+    startCost = 0
+    
+    startHeuristic = heuristic(startState, problem)
+    
+    # 優先級 = cost + h
+    startPriority = startCost + startHeuristic
+    
+    frontier.push( (startState, [], startCost), startPriority ) # ( , 動作列表, )
+
+    while not frontier.isEmpty():
+        
+        currentState, actions, currentCost_g = frontier.pop() # 最低節點
+        
+        if problem.isGoalState(currentState):
+            return actions
+            
+        if currentState not in expanded:
+            
+            expanded.add(currentState)
+            
+            successors = problem.getSuccessors(currentState)
+            
+            for nextState, action, stepCost in successors:
+                
+                newActions = actions + [action]
+                newCost_g = currentCost_g + stepCost
+                
+                newHeuristic_h = heuristic(nextState, problem)
+                
+                newPriority_f = newCost_g + newHeuristic_h
+                
+                frontier.push( (nextState, newActions, newCost_g), newPriority_f )
+
+    return []
+
+
 
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+
+'''
+
+python pacman.py -l bigSearch -p ClosestDotSearchAgent
+
+'''
